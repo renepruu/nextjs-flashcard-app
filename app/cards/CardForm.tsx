@@ -1,48 +1,49 @@
 "use client";
 
 import { useState } from "react";
-import { TextInput, Textarea, Button, Stack } from "@mantine/core";
-import { useForm } from "@mantine/form";
 
 type Props = {
-  onSubmit: (data: { question: string; answer: string }) => void;
-  initialData?: { question: string; answer: string };
+  addCard: (question: string, answer: string) => Promise<void>;
 };
 
-export default function CardForm({ onSubmit, initialData }: Props) {
-  const form = useForm({
-    initialValues: {
-      question: initialData?.question ?? "",
-      answer: initialData?.answer ?? "",
-    },
-    validate: {
-      question: (v) => (v.trim() ? null : "Question is required"),
-      answer: (v) => (v.trim() ? null : "Answer is required"),
-    },
-  });
-
+export default function CardForm({ addCard }: Props) {
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (values: typeof form.values) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!question.trim() || !answer.trim()) return;
     setLoading(true);
-    onSubmit(values);
+    await addCard(question, answer);
+    setQuestion("");
+    setAnswer("");
     setLoading(false);
-    form.reset();
   };
 
   return (
-    <form onSubmit={form.onSubmit(handleSubmit)}>
-      <Stack>
-        <TextInput
-          label="Question"
-          {...form.getInputProps("question")}
-          required
-        />
-        <Textarea label="Answer" {...form.getInputProps("answer")} required />
-        <Button type="submit" loading={loading}>
-          Save Card
-        </Button>
-      </Stack>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-2 mb-4">
+      <input
+        type="text"
+        placeholder="Question"
+        value={question}
+        onChange={(e) => setQuestion(e.target.value)}
+        className="border rounded p-2"
+      />
+      <input
+        type="text"
+        placeholder="Answer"
+        value={answer}
+        onChange={(e) => setAnswer(e.target.value)}
+        className="border rounded p-2"
+      />
+      <button
+        type="submit"
+        disabled={loading}
+        className="bg-indigo-600 text-white rounded p-2 mt-2 hover:bg-indigo-700"
+      >
+        {loading ? "Adding..." : "Add Card"}
+      </button>
     </form>
   );
 }
