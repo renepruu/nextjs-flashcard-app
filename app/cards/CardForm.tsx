@@ -2,27 +2,53 @@
 
 import { useState } from "react";
 
-type Props = {
-  addCard: (question: string, answer: string) => Promise<void>;
+type Category = {
+  id: number;
+  name: string;
 };
 
-export default function CardForm({ addCard }: Props) {
+type Props = {
+  addCard: (
+    question: string,
+    answer: string,
+    categoryId: number | null
+  ) => Promise<void>;
+  categories: Category[];
+};
+
+export default function CardForm({ addCard, categories }: Props) {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
+  const [categoryId, setCategoryId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!question.trim() || !answer.trim()) return;
     setLoading(true);
-    await addCard(question, answer);
+    await addCard(question, answer, categoryId);
     setQuestion("");
     setAnswer("");
+    setCategoryId(null);
     setLoading(false);
   };
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2 mb-4">
+      <select
+        value={categoryId ?? ""}
+        onChange={(e) =>
+          setCategoryId(e.target.value ? Number(e.target.value) : null)
+        }
+        className="border rounded p-2"
+      >
+        <option value="">Select Category (Optional)</option>
+        {categories.map((category) => (
+          <option key={category.id} value={category.id}>
+            {category.name}
+          </option>
+        ))}
+      </select>
       <input
         type="text"
         placeholder="Question"

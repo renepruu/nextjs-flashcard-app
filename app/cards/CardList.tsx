@@ -6,11 +6,20 @@ type Card = {
   id: number;
   question: string;
   answer: string;
+  category_id: number | null;
+  categories?: {
+    name: string;
+  } | null;
 };
 
 type Props = {
   cards: Card[];
-  updateCard: (id: number, question: string, answer: string) => Promise<void>;
+  updateCard: (
+    id: number,
+    question: string,
+    answer: string,
+    categoryId: number | null
+  ) => Promise<void>;
   deleteCard: (id: number) => Promise<void>;
 };
 
@@ -18,6 +27,7 @@ export default function CardsList({ cards, updateCard, deleteCard }: Props) {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editQuestion, setEditQuestion] = useState("");
   const [editAnswer, setEditAnswer] = useState("");
+  const [editCategoryId, setEditCategoryId] = useState<number | null>(null);
 
   return (
     <ul className="space-y-3">
@@ -47,6 +57,11 @@ export default function CardsList({ cards, updateCard, deleteCard }: Props) {
               <p>
                 <strong>A:</strong> {card.answer}
               </p>
+              {card.categories && (
+                <p className="text-sm text-gray-600">
+                  <strong>Category:</strong> {card.categories.name}
+                </p>
+              )}
             </div>
           )}
 
@@ -55,7 +70,12 @@ export default function CardsList({ cards, updateCard, deleteCard }: Props) {
               <>
                 <button
                   onClick={async () => {
-                    await updateCard(card.id, editQuestion, editAnswer);
+                    await updateCard(
+                      card.id,
+                      editQuestion,
+                      editAnswer,
+                      editCategoryId
+                    );
                     setEditingId(null);
                   }}
                   className="bg-green-600 text-white p-1 rounded"
@@ -76,6 +96,7 @@ export default function CardsList({ cards, updateCard, deleteCard }: Props) {
                     setEditingId(card.id);
                     setEditQuestion(card.question);
                     setEditAnswer(card.answer);
+                    setEditCategoryId(card.category_id);
                   }}
                   className="bg-yellow-600 text-white p-1 rounded"
                 >
