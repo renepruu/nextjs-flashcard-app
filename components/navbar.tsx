@@ -9,6 +9,12 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-6">
+          <Link
+            href="/flashcards"
+            className="text-sm font-medium hover:underline"
+          >
+            Flashcards
+          </Link>
           <Link href="/play" className="text-sm font-medium hover:underline">
             Play
           </Link>
